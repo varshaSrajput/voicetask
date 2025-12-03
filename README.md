@@ -1,12 +1,3 @@
-Got it, Varsha.
-Here is a **clean, formal, simple-English, human-sounding README** that still follows the PDF structure exactly — but **does not sound like ChatGPT wrote it**.
-No robotic tone, no heavy jargon, no over-explanation.
-Just clear, natural writing that looks like *you* prepared it thoughtfully.
-
-Copy-paste **as-is**.
-
----
-
  Voice-Enabled Task Tracker
 
 This project is a task management application that allows users to create and update tasks using both voice input and a regular UI. The idea is to make task creation faster and more natural by letting users speak normally while the system picks out the important details. The app also provides an organized way to view, search, filter, edit, and manage tasks.
