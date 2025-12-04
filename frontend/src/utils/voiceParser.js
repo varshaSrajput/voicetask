@@ -1,62 +1,48 @@
-export function interpretSpeech(text) {
-  const t = text.toLowerCase()
+export function parseVoiceText(text) {
+  const lower = text.toLowerCase();
 
-  let priority = "Medium"
-  if (t.includes("high") || t.includes("urgent")) priority = "High"
-  if (t.includes("low")) priority = "Low"
+  // Priority detection
+  let priority = "Medium";
+  if (lower.includes("high")) priority = "High";
+  if (lower.includes("low")) priority = "Low";
 
-  let status = "To Do"
-  if (t.includes("progress")) status = "In Progress"
-  if (t.includes("done") || t.includes("complete")) status = "Done"
+  // Status detection
+  let status = "To Do";
+  if (lower.includes("in progress")) status = "In Progress";
+  if (lower.includes("done") || lower.includes("completed")) status = "Done";
 
-  let dueDate = null
-  const now = new Date()
+  // Title extraction (simple)
+  let title = text;
+  if (lower.startsWith("create")) title = text.replace(/create/i, "").trim();
+  if (lower.startsWith("add")) title = text.replace(/add/i, "").trim();
+  if (lower.startsWith("remind me to"))
+    title = text.replace(/remind me to/i, "").trim();
 
-  if (t.includes("tomorrow")) {
-    const d = new Date()
-    d.setDate(d.getDate() + 1)
-    dueDate = d
-  }
+  // Due date parsing
+  let dueDate = null;
 
-  if (t.includes("day after tomorrow")) {
-    const d = new Date()
-    d.setDate(d.getDate() + 2)
-    dueDate = d
-  }
+  const today = new Date();
+  const oneDay = 24 * 60 * 60 * 1000;
 
-  // in X days
-  const matchDays = t.match(/in (\d+) days/)
-  if (matchDays) {
-    const d = new Date()
-    d.setDate(d.getDate() + parseInt(matchDays[1]))
-    dueDate = d
-  }
-
-  // next Monday, next Friday, etc
-  const weekdays = [
-    "sunday","monday","tuesday","wednesday","thursday","friday","saturday"
-  ]
-  for (let i = 0; i < weekdays.length; i++) {
-    if (t.includes("next " + weekdays[i])) {
-      const d = new Date()
-      const target = i
-      while (d.getDay() !== target) {
-        d.setDate(d.getDate() + 1)
-      }
-      d.setDate(d.getDate() + 7)
-      dueDate = d
+  if (lower.includes("tomorrow")) {
+    dueDate = new Date(today.getTime() + oneDay);
+  } else if (lower.includes("today")) {
+    dueDate = today;
+  } else if (lower.includes("in")) {
+    const match = lower.match(/in (\d+) days?/);
+    if (match) {
+      const days = parseInt(match[1], 10);
+      dueDate = new Date(today.getTime() + days * oneDay);
     }
   }
 
-  // clean text to get the title
-  const cleaned = t
-    .replace("create", "")
-    .replace("add", "")
-    .replace("task", "")
-    .replace("make", "")
-    .trim()
+  // Fallback title
+  if (!title) title = text;
 
-  const title = cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
-
-  return { title, priority, status, dueDate }
+  return {
+    title,
+    priority,
+    status,
+    dueDate,
+  };
 }
